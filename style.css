@@ -1,0 +1,79 @@
+
+/* Basis container */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #004080;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+}
+
+header .logo {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+header nav a, header nav button {
+  color: white;
+  text-decoration: none;
+  margin-left: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* Dossierlijst */
+#dossierList {
+  margin-top: 1rem;
+}
+
+.dossier-card {
+  background-color: #f0f0f0;
+  border-left: 6px solid #004080;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.dossier-card img {
+  max-width: 100%;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #f0f0f0;
+  margin: 10% auto;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.closeBtn {
+  float: right;
+  font-size: 1.5rem;
+  cursor: pointer;
+}

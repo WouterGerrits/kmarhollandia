@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossiers - Korpsleiding</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  main {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  h1 {
+    text-align: center;
+    color: #ffffff;
+  }
+  #dossierForm {
+    background: #f0f0f0;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  #dossierForm input, #dossierForm textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 0.8rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  #dossierForm input[type="file"] {
+    padding: 0.2rem;
+  }
+  #dossierForm button {
+    background: #004080;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #dossierForm button:hover {
+    background: #003060;
+  }
+  .dossier-card {
+    background: #e0e0e0;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  .dossier-card img {
+    max-width: 200px;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+  }
+  .dossier-card button {
+    margin-right: 0.5rem;
+    background: #004080;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .dossier-card button:hover {
+    background: #003060;
+  }
+  
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Dossierbeheer</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="korpsleiding.html">Korpsleiding</a>
+    <a href="fotos.html">Foto’s</a>
+    <a href="wetboek.html">Wetboek</a>
+    <a href="rangstructuur.html">Rangstructuur</a>
+    <a href="dreigingsniveau.html">Dreigingsniveau</a>
+    <a href="overons.html">Over Ons</a>
+    <a href="login.html">Uitloggen</a>
+  </nav>
+</header>
+<!-- Zoekveld boven het formulier -->
+<input type="text" id="searchInput" placeholder="Zoek op titel..." style="width:100%; padding:1.5rem; margin-bottom:1rem; border-radius:6px; border:1px solid #004080;">
+<main>
+  <form id="dossierForm">
+    <h2>Nieuw Dossier</h2>
+    <input type="text" id="titelInput" placeholder="Titel" required>
+    <input type="date" id="geboortedatumInput" placeholder="Geboortedatum" required>
+    <textarea id="infoInput" placeholder="Informatie" required></textarea>
+    <input type="file" id="afbeeldingInput" accept=".png,.jpg,.jpeg,.webp" multiple>
+    <button type="submit">Toevoegen</button>
+  </form>
+
+  <div id="dossierList"></div>
+</main>
+
+<script src="dossiers.js"></script>
+</body>
+</html>

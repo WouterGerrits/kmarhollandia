@@ -19,14 +19,30 @@ const infoInput = document.getElementById("infoInput");
 const afbeeldingInput = document.getElementById("afbeeldingInput");
 const searchInput = document.getElementById("searchInput");
 
+// Discord webhook log functie
+function sendDiscordLog(action, dossier) {
+  const webhookUrl = "https://discord.com/api/webhooks/1476712827224854552/X7MZIrB8ft88By3QyuJonQtNuLjNtAuL4Xsf2nBpcyFoet9yE6_8sCAumIw2H2XAONTn";
+  const content = `📌 **Actie:** ${action}\n` +
+                  `📄 **Naam:** ${dossier.titel}\n` +
+                  `📇 **Roepnummer:** ${dossier.roepnummer}\n` +
+                  `👤 **Geboortedatum:** ${dossier.geboortedatum || "Niet opgegeven"}\n` +
+                  `🕒 **Datum:** ${dossier.datum}`;
+
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({content})
+  }).catch(err => console.error("Webhook error:", err));
+}
+
 // Render dossiers
 function render(filteredDossiers = dossiers){
   dossierList.innerHTML = "";
 
-  // Van nieuw naar oud
-  const sorted = filteredDossiers.slice().reverse();
+  // Nieuwste eerst
+  const displayDossiers = [...filteredDossiers].reverse();
 
-  sorted.forEach((d, i) => {
+  displayDossiers.forEach((d) => {
     const origineleIndex = dossiers.indexOf(d);
     const geboortedatumFormatted = d.geboortedatum ? d.geboortedatum.split("-").reverse().join("-") : "";
 
@@ -77,10 +93,16 @@ if(dossierForm){
     const images = [];
     let loaded = 0;
 
-    if(files.length === 0){
-      dossiers.push({titel, roepnummer, geboortedatum, info, afbeeldingen: [], datum});
+    function finalizeDossier(imgs){
+      const nieuwDossier = {titel, roepnummer, geboortedatum, info, afbeeldingen: imgs, datum};
+      dossiers.push(nieuwDossier);
       save();
       dossierForm.reset();
+      sendDiscordLog("Dossier toegevoegd", nieuwDossier);
+    }
+
+    if(files.length === 0){
+      finalizeDossier([]);
       return;
     }
 
@@ -90,9 +112,7 @@ if(dossierForm){
         images.push(e.target.result);
         loaded++;
         if(loaded === files.length){
-          dossiers.push({titel, roepnummer, geboortedatum, info, afbeeldingen: images, datum});
-          save();
-          dossierForm.reset();
+          finalizeDossier(images);
         }
       }
       reader.readAsDataURL(file);
@@ -116,6 +136,7 @@ window.editDossier = function(i){
     d.geboortedatum = newGeboortedatum;
     d.info = newInfo;
     save();
+    sendDiscordLog("Dossier bewerkt", d);
   }
 }
 
@@ -123,8 +144,9 @@ window.editDossier = function(i){
 window.deleteDossier = function(i){
   if(role !== "korpsleiding") return alert("Je hebt geen rechten om dossiers te verwijderen!");
   if(confirm("Weet je zeker dat je dit dossier wilt verwijderen?")){
-    dossiers.splice(i,1);
+    const removed = dossiers.splice(i,1)[0];
     save();
+    sendDiscordLog("Dossier verwijderd", removed);
   }
 }
 

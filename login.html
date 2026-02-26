@@ -13,16 +13,20 @@
   }
 
   /* Login box */
-  .login-container {
-    background: #ffffff;
-    padding: 2rem 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    margin: 4rem auto 0;
-  }
+.login-container {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+
+  width: 90%;              /* geen 100% meer */
+  max-width: 380px;        /* iets kleiner */
+  
+  text-align: center;
+  margin: 2rem auto;
+
+  box-sizing: border-box;  /* belangrijk */
+}
 
   .login-container h1 {
     color: #004080;
@@ -61,6 +65,8 @@
     margin-bottom: 1rem;
     font-size: 0.9rem;
   }
+
+  
 </style>
 </head>
 <body>

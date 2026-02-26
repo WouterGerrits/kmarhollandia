@@ -116,14 +116,14 @@ function login() {
   }
 
   // Politie accounts
-  if(user === "politiechef" && pass === "PolitieHrB2103!" && role === "korpsleiding") {
+  if(user === "polkorpsleiding" && pass === "Politiedsi1452!" && role === "korpsleiding") {
     localStorage.setItem("loggedIn", "true");
     localStorage.setItem("role", "korpsleiding");
     localStorage.setItem("organisatie", "politie");
     window.location.href = "dossiers.html";
     return;
   }
-  if(user === "politieagent1" && pass === "Politie2026!" && role === "agent") {
+  if(user === "politieagent1" && pass === "Politie0391!" && role === "agent") {
     localStorage.setItem("loggedIn", "true");
     localStorage.setItem("role", "agent");
     localStorage.setItem("organisatie", "politie");

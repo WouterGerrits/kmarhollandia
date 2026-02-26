@@ -24,7 +24,7 @@ function login() {
   }
 
   // Politie Korpsleiding
-  if(user === "polkorpsleiding" && pass === "Politiedsi0421!") {
+  if(user === "polkorpsleiding" && pass === "Politiedsi1452!") {
     localStorage.setItem('loggedIn', 'true');
     localStorage.setItem('role', 'korpsleiding');
     localStorage.setItem('organisatie', 'politie');
@@ -33,7 +33,7 @@ function login() {
   }
 
   // Politie Agent
-  if(user === "politieagent1" && pass === "Politie2026!") {
+  if(user === "politieagent1" && pass === "Politie0391!") {
     localStorage.setItem('loggedIn', 'true');
     localStorage.setItem('role', 'agent');
     localStorage.setItem('organisatie', 'politie');

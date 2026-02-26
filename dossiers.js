@@ -129,7 +129,7 @@ window.editDossier = function(i){
 
   const newTitel = prompt("Naam:", d.titel);
   const newRoepnummer = prompt("Roepnummer:", d.roepnummer);
-  const newGeboortedatum = prompt("Geboortedatum (DD-MM-YYYY):", d.geboortedatum || "");
+  const newGeboortedatum = prompt("Geboortedatum (DD-MM-JJJJ):", d.geboortedatum || "");
   const newInfo = prompt("Info:", d.info);
 
   if(newTitel && newRoepnummer && newInfo){
@@ -167,3 +167,4 @@ if(searchInput){
 
 // Initial render
 render();
+

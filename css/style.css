@@ -137,10 +137,11 @@ ul li::before {
   margin-top: 1rem;
 }
 
+/* Foto-grid */
 .photo-grid img {
   width: 100%;
-  height: 150px;
-  object-fit: cover;
+  aspect-ratio: 4/3; /* breedte:hoogte ratio */
+  object-fit: cover;  /* vult de ruimte netjes zonder vervormen */
   border-radius: 8px;
   transition: transform 0.3s, box-shadow 0.3s;
 }

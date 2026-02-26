@@ -23,7 +23,10 @@ const searchInput = document.getElementById("searchInput");
 function render(filteredDossiers = dossiers){
   dossierList.innerHTML = "";
 
-  filteredDossiers.forEach((d, i) => {
+  // Van nieuw naar oud
+  const sorted = filteredDossiers.slice().reverse();
+
+  sorted.forEach((d, i) => {
     const origineleIndex = dossiers.indexOf(d);
     const geboortedatumFormatted = d.geboortedatum ? d.geboortedatum.split("-").reverse().join("-") : "";
 
@@ -36,7 +39,7 @@ function render(filteredDossiers = dossiers){
       ${geboortedatumFormatted ? `<p><strong>Geboortedatum:</strong> ${geboortedatumFormatted}</p>` : ""}
       <p>${d.info}</p>
       <p><em>Aangemaakt op: ${d.datum}</em></p>
-      ${d.afbeeldingen.map(img => `<img src="${img}" alt="Afbeelding">`).join('')}
+      ${d.afbeeldingen.map(img => `<img src="${img}" alt="Afbeelding" style="max-width:200px;margin-right:5px;">`).join('')}
       <div style="margin-top:0.5rem;">
         ${role === "korpsleiding" ? `
           <button onclick="editDossier(${origineleIndex})">Bewerken</button>
@@ -131,7 +134,7 @@ if(searchInput){
     const query = this.value.toLowerCase();
     const filtered = dossiers.filter(d =>
       d.titel.toLowerCase().includes(query) ||
-      d.geboortedatum.toLowerCase().includes(query) ||
+      (d.geboortedatum && d.geboortedatum.toLowerCase().includes(query)) ||
       d.roepnummer.toLowerCase().includes(query)
     );
     render(filtered);

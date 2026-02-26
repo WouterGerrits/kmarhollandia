@@ -146,7 +146,11 @@ ul li::before {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.photo-grid img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+.photo-grid img {
+  width: 100%;
+  height: 250px;  /* hoger dan de oude 150px */
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
+

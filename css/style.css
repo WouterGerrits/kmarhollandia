@@ -132,25 +132,17 @@ ul li::before {
 
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* iets breder */
   gap: 1rem;
   margin-top: 1rem;
 }
 
-/* Foto-grid */
 .photo-grid img {
   width: 100%;
-  aspect-ratio: 4/3; /* breedte:hoogte ratio */
-  object-fit: cover;  /* vult de ruimte netjes zonder vervormen */
+  aspect-ratio: 4/3;    /* hoogte past automatisch bij breedte */
+  object-fit: cover;    /* vult netjes zonder vervormen */
   border-radius: 8px;
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.photo-grid img {
-  width: 100%;
-  height: 250px;  /* hoger dan de oude 150px */
-  object-fit: cover;
-  border-radius: 8px;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
 

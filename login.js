@@ -1,22 +1,42 @@
 // login.js
 
 function login() {
-  const user = document.getElementById('username').value;
-  const pass = document.getElementById('password').value;
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
   const errorMsg = document.getElementById('errorMsg');
 
-  // Admin/Korpsleiding login
-  if(user === "admin" && pass === "admin123") {
-    localStorage.setItem('loggedIn', 'true'); 
-    localStorage.setItem('role', 'korpsleiding'); // rol opslaan
+  // KMAR Korpsleiding
+  if(user === "luitenantgeneraal" && pass === "Kmarhrb2103!") {
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('role', 'korpsleiding');
+    localStorage.setItem('organisatie', 'kmar');
     window.location.href = "dossiers.html";
     return;
   }
 
-  // KMAR Agent login
-  if(user === "agent" && pass === "agent123") {
-    localStorage.setItem('loggedIn', 'true'); 
-    localStorage.setItem('role', 'agent'); // rol opslaan
+  // KMAR Agent
+  if(user === "kmaragent1" && pass === "Kmar2026!") {
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('role', 'agent');
+    localStorage.setItem('organisatie', 'kmar');
+    window.location.href = "dossiers.html";
+    return;
+  }
+
+  // Politie Korpsleiding
+  if(user === "polkorpsleiding" && pass === "Politiedsi0421!") {
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('role', 'korpsleiding');
+    localStorage.setItem('organisatie', 'politie');
+    window.location.href = "dossiers.html";
+    return;
+  }
+
+  // Politie Agent
+  if(user === "politieagent1" && pass === "Politie2026!") {
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('role', 'agent');
+    localStorage.setItem('organisatie', 'politie');
     window.location.href = "dossiers.html";
     return;
   }

@@ -20,13 +20,17 @@ const afbeeldingInput = document.getElementById("afbeeldingInput");
 const searchInput = document.getElementById("searchInput");
 
 // Discord webhook log functie
-function sendDiscordLog(action, dossier) {
+function sendDiscordLog(action, dossier, before = null) {
   const webhookUrl = "https://discord.com/api/webhooks/1476712827224854552/X7MZIrB8ft88By3QyuJonQtNuLjNtAuL4Xsf2nBpcyFoet9yE6_8sCAumIw2H2XAONTn";
-  const content = `📌 **Actie:** ${action}\n` +
-                  `📄 **Naam:** ${dossier.titel}\n` +
-                  `📇 **Roepnummer:** ${dossier.roepnummer}\n` +
-                  `👤 **Geboortedatum:** ${dossier.geboortedatum || "Niet opgegeven"}\n` +
-                  `🕒 **Datum:** ${dossier.datum}`;
+  
+  let content = `📌 **Actie:** ${action}\n`;
+  
+  if(before){
+    content += `**Voor:**\n📄 Naam: ${before.titel}\n📇 Roepnummer: ${before.roepnummer}\n👤 Geboortedatum: ${before.geboortedatum || "Niet opgegeven"}\n📝 Info: ${before.info}\n🕒 Datum: ${before.datum}\n\n`;
+    content += `**Na:**\n📄 Naam: ${dossier.titel}\n📇 Roepnummer: ${dossier.roepnummer}\n👤 Geboortedatum: ${dossier.geboortedatum || "Niet opgegeven"}\n📝 Info: ${dossier.info}\n🕒 Datum: ${dossier.datum}`;
+  } else {
+    content += `📄 Naam: ${dossier.titel}\n📇 Roepnummer: ${dossier.roepnummer}\n👤 Geboortedatum: ${dossier.geboortedatum || "Niet opgegeven"}\n📝 Info: ${dossier.info}\n🕒 Datum: ${dossier.datum}`;
+  }
 
   fetch(webhookUrl, {
     method: "POST",
@@ -38,9 +42,7 @@ function sendDiscordLog(action, dossier) {
 // Render dossiers
 function render(filteredDossiers = dossiers){
   dossierList.innerHTML = "";
-
-  // Nieuwste eerst
-  const displayDossiers = [...filteredDossiers].reverse();
+  const displayDossiers = [...filteredDossiers].reverse(); // Nieuwste eerst
 
   displayDossiers.forEach((d) => {
     const origineleIndex = dossiers.indexOf(d);
@@ -55,14 +57,13 @@ function render(filteredDossiers = dossiers){
       ${geboortedatumFormatted ? `<p><strong>Geboortedatum:</strong> ${geboortedatumFormatted}</p>` : ""}
       <p>${d.info}</p>
       <p><em>Aangemaakt op: ${d.datum}</em></p>
-      ${d.afbeeldingen.map(img => `<img src="${img}" alt="Afbeelding" style="max-width:200px;margin-right:5px;">`).join('')}
+      ${d.afbeeldingen && d.afbeeldingen.length ? d.afbeeldingen.map(img => `<img src="${img}" alt="Afbeelding" style="max-width:200px;margin-right:5px;margin-top:5px;">`).join('') : ""}
       <div style="margin-top:0.5rem;">
         ${role === "korpsleiding" ? `
           <button onclick="editDossier(${origineleIndex})">Bewerken</button>
           <button onclick="deleteDossier(${origineleIndex})">Verwijderen</button>` : ""}
       </div>
     `;
-
     dossierList.appendChild(div);
   });
 }
@@ -103,29 +104,30 @@ if(dossierForm){
 
     if(files.length === 0){
       finalizeDossier([]);
-      return;
-    }
-
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = function(e){
-        images.push(e.target.result);
-        loaded++;
-        if(loaded === files.length){
-          finalizeDossier(images);
+    } else {
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e){
+          images.push(e.target.result);
+          loaded++;
+          if(loaded === files.length){
+            finalizeDossier(images);
+          }
         }
-      }
-      reader.readAsDataURL(file);
-    });
+        reader.readAsDataURL(file);
+      });
+    }
   });
 }
 
-// Bewerken (alleen Korpsleiding)
+// Bewerken
 window.editDossier = function(i){
   if(role !== "korpsleiding") return alert("Je hebt geen rechten om dossiers te bewerken!");
 
   const d = dossiers[i];
-  const newTitel = prompt("Titel:", d.titel);
+  const before = {...d}; // Maak copy van oude values
+
+  const newTitel = prompt("Naam:", d.titel);
   const newRoepnummer = prompt("Roepnummer:", d.roepnummer);
   const newGeboortedatum = prompt("Geboortedatum (DD-MM-YYYY):", d.geboortedatum || "");
   const newInfo = prompt("Info:", d.info);
@@ -136,11 +138,11 @@ window.editDossier = function(i){
     d.geboortedatum = newGeboortedatum;
     d.info = newInfo;
     save();
-    sendDiscordLog("Dossier bewerkt", d);
+    sendDiscordLog("Dossier bewerkt", d, before); // Stuur Before + After
   }
 }
 
-// Verwijderen (alleen Korpsleiding)
+// Verwijderen
 window.deleteDossier = function(i){
   if(role !== "korpsleiding") return alert("Je hebt geen rechten om dossiers te verwijderen!");
   if(confirm("Weet je zeker dat je dit dossier wilt verwijderen?")){
@@ -150,7 +152,7 @@ window.deleteDossier = function(i){
   }
 }
 
-// Zoekfunctie (titel, geboortedatum, roepnummer)
+// Zoekfunctie
 if(searchInput){
   searchInput.addEventListener("input", function(){
     const query = this.value.toLowerCase();

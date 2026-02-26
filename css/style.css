@@ -162,3 +162,33 @@ ul li::before {
     grid-template-columns: 1fr;
   }
 }
+
+.nieuws {
+  padding: 2rem 1rem;
+  background-color: #f5f5f5; /* zelfde als body */
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.nieuws h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.news-item {
+  background-color: #e0e0e0; /* subtiel contrast zodat elk item opvalt */
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.news-item h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.news-item .date {
+  display: block;
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 0.5rem;
+}

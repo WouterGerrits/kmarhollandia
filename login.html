@@ -13,20 +13,18 @@
   }
 
   /* Login box */
-.login-container {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  .login-container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 
-  width: 90%;              /* geen 100% meer */
-  max-width: 380px;        /* iets kleiner */
-  
-  text-align: center;
-  margin: 2rem auto;
-
-  box-sizing: border-box;  /* belangrijk */
-}
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+    margin: 2rem auto;
+    box-sizing: border-box;
+  }
 
   .login-container h1 {
     color: #004080;
@@ -65,8 +63,6 @@
     margin-bottom: 1rem;
     font-size: 0.9rem;
   }
-
-  
 </style>
 </head>
 <body>
@@ -92,29 +88,50 @@
   <input type="password" id="password" placeholder="Wachtwoord">
   <select id="role">
     <option value="korpsleiding">Korpsleiding</option>
-    <option value="agent">KMAR Agent</option>
+    <option value="agent">Agent</option>
   </select>
   <button onclick="login()">Inloggen</button>
 </div>
 
 <script>
 function login() {
-  const user = document.getElementById('username').value;
-  const pass = document.getElementById('password').value;
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
   const role = document.getElementById('role').value;
 
-  // Voorbeeld accounts
+  // KMAR accounts
   if(user === "luitenantgeneraal" && pass === "Kmarhrb2103!" && role === "korpsleiding") {
     localStorage.setItem("loggedIn", "true");
     localStorage.setItem("role", "korpsleiding");
+    localStorage.setItem("organisatie", "kmar");
     window.location.href = "dossiers.html";
-  } else if(user === "kmaragent1" && pass === "Kmar2026!" && role === "agent") {
+    return;
+  } 
+  if(user === "kmaragent1" && pass === "Kmar2026!" && role === "agent") {
     localStorage.setItem("loggedIn", "true");
     localStorage.setItem("role", "agent");
+    localStorage.setItem("organisatie", "kmar");
     window.location.href = "dossiers.html";
-  } else {
-    document.getElementById('errorMsg').innerText = "Ongeldige gebruikersnaam, wachtwoord of rol!";
+    return;
   }
+
+  // Politie accounts
+  if(user === "politiechef" && pass === "PolitieHrB2103!" && role === "korpsleiding") {
+    localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("role", "korpsleiding");
+    localStorage.setItem("organisatie", "politie");
+    window.location.href = "dossiers.html";
+    return;
+  }
+  if(user === "politieagent1" && pass === "Politie2026!" && role === "agent") {
+    localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("role", "agent");
+    localStorage.setItem("organisatie", "politie");
+    window.location.href = "dossiers.html";
+    return;
+  }
+
+  document.getElementById('errorMsg').innerText = "Ongeldige gebruikersnaam, wachtwoord of rol!";
 }
 </script>
 

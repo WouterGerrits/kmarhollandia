@@ -111,18 +111,26 @@
 </header>
 
 <!-- Zoekveld -->
-<input type="text" id="searchInput" placeholder="Zoek op titel, geboortedatum of roepnummer...">
+<input type="text" id="searchInput" placeholder="Zoek op titel, geboortedatum, kenteken of roepnummer...">
 
 <main>
-  <form id="dossierForm">
-    <h2>Nieuw Dossier</h2>
-    <input type="text" id="titelInput" placeholder="Naam" required>
-    <input type="text" id="roepnummerInput" placeholder="Roepnummer" required>
-    <input type="date" id="geboortedatumInput" placeholder="Geboortedatum" required>
-    <textarea id="infoInput" placeholder="Informatie" required></textarea>
-    <input type="file" id="afbeeldingInput" accept=".png,.jpg,.jpeg,.webp" multiple>
-    <button type="submit">Toevoegen</button>
-  </form>
+<form id="dossierForm">
+  <h2>Nieuw Dossier</h2>
+
+  <input type="text" id="titelInput" placeholder="Naam">
+
+  <input type="text" id="roepnummerInput" placeholder="Roepnummer" required>
+
+  <input type="text" id="kentekenInput" placeholder="Kenteken voertuig">
+
+  <input type="date" id="geboortedatumInput">
+
+  <textarea id="infoInput" placeholder="Info"></textarea>
+
+  <input type="file" id="afbeeldingInput" accept=".png,.jpg,.jpeg,.webp" multiple>
+
+  <button type="submit">Toevoegen</button>
+</form>
 
   <div id="dossierList"></div>
 </main>

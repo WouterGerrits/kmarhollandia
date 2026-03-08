@@ -87,7 +87,7 @@ function updateVerlopenStatus(){
 
   dossiers.forEach(d => {
 
-    if(d.label === "Arrestatiebevel"){
+   if(d.label === "Arrestatiebevel" || d.label === "Overig"){
 
       const created = new Date(d.datum).getTime();
       const hours = (now - created) / (1000*60*60);

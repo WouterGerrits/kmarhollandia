@@ -23,14 +23,14 @@
     border-radius: 8px;
     margin-bottom: 2rem;
   }
-#dossierForm input, #dossierForm textarea, #dossierForm select {
-  width: 100%;
-  padding: 0.6rem;
-  margin-bottom: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
+  #dossierForm input, #dossierForm textarea, #dossierForm select {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 0.8rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
   #dossierForm input[type="file"] {
     padding: 0.2rem;
   }
@@ -44,6 +44,24 @@
     width: 100%;
   }
   #dossierForm button:hover {
+    background: #003060;
+  }
+
+  /* Filter buttons */
+  #filters {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  #filters button {
+    margin: 0 0.3rem 0.5rem 0.3rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    border: none;
+    background: #004080;
+    color: white;
+    cursor: pointer;
+  }
+  #filters button:hover {
     background: #003060;
   }
 
@@ -113,24 +131,32 @@
 <!-- Zoekveld -->
 <input type="text" id="searchInput" placeholder="Zoek op titel, geboortedatum, kenteken of roepnummer...">
 
+<!-- Filters -->
+<div id="filters">
+  <button onclick="filterStatus('Alle')">Alle</button>
+  <button onclick="filterStatus('Openstaand')">Openstaand</button>
+  <button onclick="filterStatus('Afgehandeld')">Afgehandeld</button>
+  <button onclick="filterStatus('Verlopen')">Verlopen</button>
+</div>
+
 <main>
 <form id="dossierForm">
   <h2>Nieuw Dossier</h2>
 
   <input type="text" id="titelInput" placeholder="Naam">
 
-<select id="dienstInput">
-  <option value="Politie">Politie</option>
-  <option value="KMar">KMar</option>
-</select>
+  <select id="dienstInput">
+    <option value="Politie">Politie</option>
+    <option value="KMar">KMar</option>
+  </select>
 
   <input type="text" id="roepnummerInput" placeholder="Roepnummer" required>
 
-<select id="labelInput" required>
-  <option value="Groot Onderzoek">Groot Onderzoek</option>
-  <option value="Arrestatiebevel">Arrestatiebevel</option>
-  <option value="Overig">Overig</option>
-</select>
+  <select id="labelInput" required>
+    <option value="Groot Onderzoek">Groot Onderzoek</option>
+    <option value="Arrestatiebevel">Arrestatiebevel</option>
+    <option value="Overig">Overig</option>
+  </select>
 
   <input type="text" id="kentekenInput" placeholder="Kenteken voertuig">
 
@@ -143,10 +169,9 @@
   <button type="submit">Toevoegen</button>
 </form>
 
-  <div id="dossierList"></div>
+<div id="dossierList"></div>
 </main>
 
 <script src="dossiers.js"></script>
 </body>
 </html>
-

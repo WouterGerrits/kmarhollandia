@@ -23,14 +23,14 @@
     border-radius: 8px;
     margin-bottom: 2rem;
   }
-  #dossierForm input, #dossierForm textarea {
-    width: 100%;
-    padding: 0.6rem;
-    margin-bottom: 0.8rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
+#dossierForm input, #dossierForm textarea, #dossierForm select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 0.8rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
   #dossierForm input[type="file"] {
     padding: 0.2rem;
   }
@@ -119,13 +119,24 @@
 
   <input type="text" id="titelInput" placeholder="Naam">
 
+<select id="dienstInput">
+  <option value="Politie">Politie</option>
+  <option value="KMar">KMar</option>
+</select>
+
   <input type="text" id="roepnummerInput" placeholder="Roepnummer" required>
+
+<select id="labelInput" required>
+  <option value="Groot Onderzoek">Groot Onderzoek</option>
+  <option value="Arrestatiebevel">Arrestatiebevel</option>
+  <option value="Overig">Overig</option>
+</select>
 
   <input type="text" id="kentekenInput" placeholder="Kenteken voertuig">
 
   <input type="date" id="geboortedatumInput">
 
-  <textarea id="infoInput" placeholder="Info"></textarea>
+  <textarea id="infoInput" placeholder="Info" required></textarea>
 
   <input type="file" id="afbeeldingInput" accept=".png,.jpg,.jpeg,.webp" multiple>
 

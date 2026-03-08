@@ -138,7 +138,7 @@ function render(filteredDossiers = dossiers){
 
       <h3>${d.titel || ""}</h3>
 
-      <p><strong>Label:</strong> ${d.label}</p>
+      <p><strong>Label:</strong> <span style="color: ${d.label === 'Verlopen' ? 'red' : 'black'};">${d.label}</span></p>
 
       <p><strong>Dienst:</strong> ${d.dienst || "Onbekend"}</p>
 

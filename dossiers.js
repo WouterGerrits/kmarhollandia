@@ -252,7 +252,7 @@ if(dossierForm){
 
         reader.onload = function(e){
 
-          images.puuodateh(e.target.result);
+          images.push(e.target.result);
 
           loaded++;
 

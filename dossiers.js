@@ -76,14 +76,15 @@ function updateVerlopenStatus(){
   dossiers.forEach(d => {
     if(d.label === "Arrestatiebevel" || d.label === "Overig"){
       const created = new Date(d.datum).getTime();
-      const hours = (now - created) / (1000*60*60);
+      const seconds = (now - created) / 1000;
 
-      if(hours >= 48 && d.label !== "Groot Onderzoek" && d.status !== "Afgehandeld"){
-        const before = {...d};
-        d.label = "Verlopen";
-        changed = true;
-        sendDiscordLog("Dossier automatisch verlopen", d, before);
-      }
+const hours = seconds / 3600; // seconden → uren
+if(hours >= 48 && d.status !== "Afgehandeld" && d.status !== "Verlopen"){
+    const before = {...d};
+    d.status = "Verlopen"; // alleen status verandert
+    changed = true;
+    sendDiscordLog("Dossier automatisch verlopen", d, before);
+}
     }
   });
 
@@ -102,14 +103,17 @@ function render(filteredDossiers = dossiers){
     const div = document.createElement("div");
     div.className = "dossier-card";
 
+    // Knop alleen tonen als status niet verlopen
+    const showButton = d.status !== "Verlopen";
+
     div.innerHTML = `
       <h3>${d.titel || ""}</h3>
-      <p><strong>Label:</strong> <span style="color: ${d.label === 'Verlopen' ? 'red' : 'black'};">${d.label}</span></p>
+      <p><strong>Label:</strong> <span style="color: black;">${d.label}</span></p>
       <p><strong>Status:</strong> 
-<span style="color: ${d.label === 'Verlopen' ? 'red' : d.status === 'Afgehandeld' ? 'blue' : 'green'};">
-  ${d.label === 'Verlopen' ? 'Verlopen' : d.status === 'Afgehandeld' ? 'Afgehandeld' : 'Openstaand'}
-</span>
-</p>
+        <span style="color: ${d.status === 'Verlopen' ? 'red' : d.status === 'Afgehandeld' ? 'blue' : 'green'};">
+          ${d.status || 'Openstaand'}
+        </span>
+      </p>
       <p><strong>Dienst:</strong> ${d.dienst || "Onbekend"}</p>
       <p><strong>Roepnummer:</strong> ${d.roepnummer}</p>
       ${d.kenteken ? `<p><strong>Kenteken:</strong> ${d.kenteken}</p>` : ""}
@@ -118,16 +122,14 @@ function render(filteredDossiers = dossiers){
       <p><em>Aangemaakt op: ${formatDateTime(d.datum)}</em></p>
       ${d.afbeeldingen && d.afbeeldingen.length ? d.afbeeldingen.map(img => `<img src="${img}" style="max-width:200px;margin-top:5px;margin-right:5px;">`).join("") : ""}
       <div style="margin-top:8px;">
-        <button onclick="toggleAfgehandeld(${origineleIndex})">
+        ${showButton ? `<button onclick="toggleAfgehandeld(${origineleIndex})">
           ${d.status === "Afgehandeld" ? (role === "korpsleiding" ? "Terugzetten" : "Afgehandeld") : "Afgehandeld"}
-        </button>
-        ${
-          role === "korpsleiding" ? `
-          <button onclick="editDossier(${origineleIndex})">Bewerken</button>
-          <button onclick="deleteDossier(${origineleIndex})">Verwijderen</button>` : ""
-        }
+        </button>` : ""}
+        ${role === "korpsleiding" ? `<button onclick="editDossier(${origineleIndex})">Bewerken</button>
+        <button onclick="deleteDossier(${origineleIndex})">Verwijderen</button>` : ""}
       </div>
     `;
+
     dossierList.appendChild(div);
   });
 }
@@ -190,6 +192,10 @@ if(dossierForm){
 // Toggle afgehandeld
 window.toggleAfgehandeld = function(i){
   const d = dossiers[i];
+  if(d.status === "Verlopen"){
+    return; // kan niet meer veranderen
+  }
+
   const before = {...d};
 
   if(d.status === "Afgehandeld" && role !== "korpsleiding"){
@@ -209,7 +215,7 @@ window.editDossier = function(i){
   const before = {...d};
   const newTitel = prompt("Naam:",d.titel);
   const newDienst = prompt("Dienst (Politie/KMar):",d.dienst);
-  const newLabel = prompt("Label (Groot Onderzoek / Arrestatiebevel / Overig / Verlopen):",d.label);
+  const newLabel = prompt("Label (Groot Onderzoek / Arrestatiebevel / Overig):",d.label);
   const newRoepnummer = prompt("Roepnummer:",d.roepnummer);
   const newKenteken = prompt("Kenteken:",d.kenteken || "");
   const newGeboortedatum = prompt("Geboortedatum:",d.geboortedatum || "");
@@ -258,3 +264,6 @@ window.filterStatus = function(status){
 // Initial
 updateVerlopenStatus();
 render();
+
+// Herhaald automatisch checken (bijvoorbeeld elke seconde voor test)
+setInterval(updateVerlopenStatus, 1000);

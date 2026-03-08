@@ -12,13 +12,18 @@ let dossiers = JSON.parse(localStorage.getItem("dossiers") || "[]");
 // Elementen
 const dossierList = document.getElementById("dossierList");
 const dossierForm = document.getElementById("dossierForm");
+
 const titelInput = document.getElementById("titelInput");
+const dienstInput = document.getElementById("dienstInput");
 const roepnummerInput = document.getElementById("roepnummerInput");
 const kentekenInput = document.getElementById("kentekenInput");
 const geboortedatumInput = document.getElementById("geboortedatumInput");
 const infoInput = document.getElementById("infoInput");
 const afbeeldingInput = document.getElementById("afbeeldingInput");
+const labelInput = document.getElementById("labelInput");
+
 const searchInput = document.getElementById("searchInput");
+
 
 // Datum formatter
 function formatDateTime(dateObj = new Date()){
@@ -32,39 +37,36 @@ function formatDateTime(dateObj = new Date()){
   return `${dag}-${maand}-${jaar} ${uren}:${minuten}:${seconden}`;
 }
 
-// Discord webhook
-function sendDiscordLog(action, dossier, before = null) {
 
-  const webhookUrl = "https://discord.com/api/webhooks/1476712827224854552/X7MZIrB8ft88By3QyuJonQtNuLjNtAuL4Xsf2nBpcyFoet9yE6_8sCAumIw2H2XAONTn";
+// Discord webhook
+function sendDiscordLog(action, dossier, before = null){
+
+const webhookUrl = "https://discord.com/api/webhooks/1476712827224854552/X7MZIrB8ft88By3QyuJonQtNuLjNtAuL4Xsf2nBpcyFoet9yE6_8sCAumIw2H2XAONTn";
 
   let content = `📌 **Actie:** ${action}\n`;
 
   if(before){
+
     content += `\n**VOOR:**\n`;
     content += `👤 Naam: ${before.titel}\n`;
+    content += `🏷 Label: ${before.label || "Geen"}\n`;
+    content += `🚓 Dienst: ${before.dienst || "Onbekend"}\n`;
     content += `📇 Roepnummer: ${before.roepnummer}\n`;
     content += `🚗 Kenteken: ${before.kenteken || "Geen"}\n`;
     content += `🎂 Geboortedatum: ${before.geboortedatum || "Niet opgegeven"}\n`;
     content += `📝 Info: ${before.info}\n\n`;
 
     content += `**NA:**\n`;
-    content += `👤 Naam: ${dossier.titel}\n`;
-    content += `📇 Roepnummer: ${dossier.roepnummer}\n`;
-    content += `🚗 Kenteken: ${dossier.kenteken || "Geen"}\n`;
-    content += `🎂 Geboortedatum: ${dossier.geboortedatum || "Niet opgegeven"}\n`;
-    content += `📝 Info: ${dossier.info}\n`;
-    content += `📅 Datum: ${formatDateTime(dossier.datum)}`;
-
-  } else {
-
-    content += `👤 Naam: ${dossier.titel}\n`;
-    content += `📇 Roepnummer: ${dossier.roepnummer}\n`;
-    content += `🚗 Kenteken: ${dossier.kenteken || "Geen"}\n`;
-    content += `🎂 Geboortedatum: ${dossier.geboortedatum || "Niet opgegeven"}\n`;
-    content += `📝 Info: ${dossier.info}\n`;
-    content += `📅 Datum: ${formatDateTime(dossier.datum)}`;
-
   }
+
+  content += `👤 Naam: ${dossier.titel}\n`;
+  content += `🏷 Label: ${dossier.label || "Geen"}\n`;
+  content += `🚓 Dienst: ${dossier.dienst || "Onbekend"}\n`;
+  content += `📇 Roepnummer: ${dossier.roepnummer}\n`;
+  content += `🚗 Kenteken: ${dossier.kenteken || "Geen"}\n`;
+  content += `🎂 Geboortedatum: ${dossier.geboortedatum || "Niet opgegeven"}\n`;
+  content += `📝 Info: ${dossier.info}\n`;
+  content += `📅 Datum: ${formatDateTime(dossier.datum)}`;
 
   fetch(webhookUrl,{
     method:"POST",
@@ -73,6 +75,43 @@ function sendDiscordLog(action, dossier, before = null) {
     },
     body:JSON.stringify({content})
   }).catch(err=>console.error("Webhook error:",err));
+
+}
+
+
+// Automatisch verlopen
+function updateVerlopenStatus(){
+
+  const now = new Date().getTime();
+  let changed = false;
+
+  dossiers.forEach(d => {
+
+    if(d.label === "Arrestatiebevel"){
+
+      const created = new Date(d.datum).getTime();
+      const hours = (now - created) / (1000*60*60);
+
+      if(hours >= 48){
+
+        const before = {...d};
+
+        d.label = "Verlopen";
+
+        sendDiscordLog("Dossier automatisch verlopen", d, before);
+
+        changed = true;
+
+      }
+
+    }
+
+  });
+
+  if(changed){
+    save();
+  }
+
 }
 
 
@@ -96,26 +135,35 @@ function render(filteredDossiers = dossiers){
     div.className = "dossier-card";
 
     div.innerHTML = `
-      <h3>${d.titel}</h3>
+
+      <h3>${d.titel || ""}</h3>
+
+      <p><strong>Label:</strong> ${d.label}</p>
+
+      <p><strong>Dienst:</strong> ${d.dienst || "Onbekend"}</p>
 
       <p><strong>Roepnummer:</strong> ${d.roepnummer}</p>
 
-      <p><strong>Kenteken:</strong> ${d.kenteken || "Niet opgegeven"}</p>
+      ${d.kenteken ? `<p><strong>Kenteken:</strong> ${d.kenteken}</p>` : ""}
 
       ${geboortedatumFormatted ? `<p><strong>Geboortedatum:</strong> ${geboortedatumFormatted}</p>` : ""}
 
       <p>${d.info}</p>
 
-   <p><em>Aangemaakt op: ${formatDateTime(d.datum)}</em></p>
+      <p><em>Aangemaakt op: ${formatDateTime(d.datum)}</em></p>
 
-      ${d.afbeeldingen && d.afbeeldingen.length
-        ? d.afbeeldingen.map(img => `<img src="${img}" style="max-width:200px;margin-top:5px;margin-right:5px;">`).join("")
+      ${
+        d.afbeeldingen && d.afbeeldingen.length
+        ? d.afbeeldingen.map(img =>
+          `<img src="${img}" style="max-width:200px;margin-top:5px;margin-right:5px;">`
+        ).join("")
         : ""
       }
 
       <div style="margin-top:8px;">
 
-      ${role === "korpsleiding"
+      ${
+        role === "korpsleiding"
         ? `
         <button onclick="editDossier(${origineleIndex})">Bewerken</button>
         <button onclick="deleteDossier(${origineleIndex})">Verwijderen</button>
@@ -124,6 +172,7 @@ function render(filteredDossiers = dossiers){
       }
 
       </div>
+
     `;
 
     dossierList.appendChild(div);
@@ -149,31 +198,30 @@ if(dossierForm){
 
     const files = Array.from(afbeeldingInput.files);
 
-   const datum = new Date().toISOString(); // ISO opslaan met datum+tijd
+    const datum = new Date().toISOString();
 
     const titel = titelInput.value.trim();
-
+    const dienst = dienstInput.value;
     const roepnummer = roepnummerInput.value.trim();
-
+    const label = labelInput.value;
     const kenteken = kentekenInput.value.trim();
-
     const geboortedatum = geboortedatumInput.value;
-
     const info = infoInput.value.trim();
 
-    if(!titel || !roepnummer || !geboortedatum || !info){
-      alert("Vul alle verplichte velden in!");
+    if(!roepnummer || !info || !label){
+      alert("Roepnummer, info en label zijn verplicht!");
       return;
     }
 
     const images = [];
-
     let loaded = 0;
 
     function finalizeDossier(imgs){
 
       const nieuwDossier = {
         titel,
+        dienst,
+        label,
         roepnummer,
         kenteken,
         geboortedatum,
@@ -189,8 +237,8 @@ if(dossierForm){
       dossierForm.reset();
 
       sendDiscordLog("Dossier toegevoegd",nieuwDossier);
-    }
 
+    }
 
     if(files.length === 0){
       finalizeDossier([]);
@@ -204,7 +252,7 @@ if(dossierForm){
 
         reader.onload = function(e){
 
-          images.push(e.target.result);
+          images.puuodateh(e.target.result);
 
           loaded++;
 
@@ -235,25 +283,21 @@ window.editDossier = function(i){
   const before = {...d};
 
   const newTitel = prompt("Naam:",d.titel);
-
+  const newDienst = prompt("Dienst (Politie/KMar):",d.dienst);
+  const newLabel = prompt("Label (Groot Onderzoek / Arrestatiebevel / Overig / Verlopen):",d.label);
   const newRoepnummer = prompt("Roepnummer:",d.roepnummer);
-
   const newKenteken = prompt("Kenteken:",d.kenteken || "");
-
   const newGeboortedatum = prompt("Geboortedatum:",d.geboortedatum || "");
-
   const newInfo = prompt("Info:",d.info);
 
-  if(newTitel && newRoepnummer && newInfo){
+  if(newRoepnummer && newInfo && newLabel){
 
     d.titel = newTitel;
-
+    d.dienst = newDienst;
+    d.label = newLabel;
     d.roepnummer = newRoepnummer;
-
     d.kenteken = newKenteken;
-
     d.geboortedatum = newGeboortedatum;
-
     d.info = newInfo;
 
     save();
@@ -292,7 +336,7 @@ if(searchInput){
 
     const filtered = dossiers.filter(d =>
 
-      d.titel.toLowerCase().includes(query) ||
+      (d.titel && d.titel.toLowerCase().includes(query)) ||
 
       d.roepnummer.toLowerCase().includes(query) ||
 
@@ -309,5 +353,6 @@ if(searchInput){
 }
 
 
-// Initial render
+// Initial
+updateVerlopenStatus();
 render();

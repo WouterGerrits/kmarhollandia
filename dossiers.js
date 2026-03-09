@@ -1,218 +1,311 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dossiers</title>
-<link rel="stylesheet" href="css/style.css">
-<style>
-  main {
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 1rem;
-  }
-  h1 {
-    text-align: center;
-    color: #ffffff;
-  }
-
-  /* Formulier */
-  #dossierForm {
-    background: #f0f0f0;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-  }
-  #dossierForm input, #dossierForm textarea, #dossierForm select {
-    width: 100%;
-    padding: 0.6rem;
-    margin-bottom: 0.8rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-  #dossierForm input[type="file"] {
-    padding: 0.2rem;
-  }
-  #dossierForm button {
-    background: #004080;
-    color: #fff;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-  }
-  #dossierForm button:hover {
-    background: #003060;
-  }
-
-  /* Filter buttons */
-  #filters {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  #filters button {
-    margin: 0 0.3rem 0.5rem 0.3rem;
-    padding: 0.5rem 0.8rem;
-    border-radius: 4px;
-    border: none;
-    background: #004080;
-    color: white;
-    cursor: pointer;
-  }
-  #filters button:hover {
-    background: #003060;
-  }
-
-  /* Dossier cards */
-  .dossier-card {
-    background: #e0e0e0;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-  }
-  .dossier-card img {
-    max-width: 200px;
-    margin-top: 0.5rem;
-    border-radius: 4px;
-  }
-  .dossier-card button {
-    margin-right: 0.5rem;
-    background: #004080;
-    color: white;
-    border: none;
-    padding: 0.4rem 0.6rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .dossier-card button:hover {
-    background: #003060;
-  }
-
-  /* Zoekveld */
-  #searchInput {
-    width: 100%;
-    max-width: 500px;
-    padding: 0.8rem;
-    margin: 1rem auto;
-    display: block;
-    border-radius: 6px;
-    border: 1px solid #004080;
-    box-sizing: border-box;
-  }
-
-  .dashboard{
-display:flex;
-gap:15px;
-margin-bottom:20px;
+// Check login
+if(localStorage.getItem("loggedIn") !== "true"){
+  window.location.href = "login.html";
 }
 
-.card{
-flex:1;
-padding:15px;
-border-radius:10px;
-background:#f4f4f4;
-text-align:center;
-font-weight:bold;
+// Rol ophalen
+const role = localStorage.getItem("role");
+
+// Dossiers ophalen
+let dossiers = JSON.parse(localStorage.getItem("dossiers") || "[]");
+
+// Elementen
+const dossierList = document.getElementById("dossierList");
+const dossierForm = document.getElementById("dossierForm");
+const titelInput = document.getElementById("titelInput");
+const dienstInput = document.getElementById("dienstInput");
+const roepnummerInput = document.getElementById("roepnummerInput");
+const kentekenInput = document.getElementById("kentekenInput");
+const geboortedatumInput = document.getElementById("geboortedatumInput");
+const infoInput = document.getElementById("infoInput");
+const afbeeldingInput = document.getElementById("afbeeldingInput");
+const labelInput = document.getElementById("labelInput");
+const searchInput = document.getElementById("searchInput");
+
+// Datum formatter
+function formatDateTime(dateObj = new Date()){
+  const d = dateObj instanceof Date ? dateObj : new Date(dateObj);
+  const dag = String(d.getDate()).padStart(2,'0');
+  const maand = String(d.getMonth()+1).padStart(2,'0');
+  const jaar = d.getFullYear();
+  const uren = String(d.getHours()).padStart(2,'0');
+  const minuten = String(d.getMinutes()).padStart(2,'0');
+  const seconden = String(d.getSeconds()).padStart(2,'0');
+  return `${dag}-${maand}-${jaar} ${uren}:${minuten}:${seconden}`;
 }
 
-.card h2{
-margin:5px 0 0 0;
-font-size:28px;
+// Discord webhook
+function sendDiscordLog(action, dossier, before = null){
+  const webhookUrl = "https://discord.com/api/webhooks/1476712827224854552/X7MZIrB8ft88By3QyuJonQtNuLjNtAuL4Xsf2nBpcyFoet9yE6_8sCAumIw2H2XAONTn";
+  let content = `📌 **Actie:** ${action}\n`;
+
+  if(before){
+    content += `\n**VOOR:**\n`;
+    content += `👤 Naam: ${before.titel}\n`;
+    content += `🏷 Label: ${before.label || "Geen"}\n`;
+    content += `🚓 Dienst: ${before.dienst || "Onbekend"}\n`;
+    content += `📇 Roepnummer: ${before.roepnummer}\n`;
+    content += `🚗 Kenteken: ${before.kenteken || "Geen"}\n`;
+    content += `🎂 Geboortedatum: ${before.geboortedatum || "Niet opgegeven"}\n`;
+    content += `📝 Info: ${before.info}\n\n`;
+    content += `**NA:**\n`;
+  }
+
+  content += `👤 Naam: ${dossier.titel}\n`;
+  content += `🏷 Label: ${dossier.label || "Geen"}\n`;
+  content += `🚓 Dienst: ${dossier.dienst || "Onbekend"}\n`;
+  content += `📇 Roepnummer: ${dossier.roepnummer}\n`;
+  content += `🚗 Kenteken: ${dossier.kenteken || "Geen"}\n`;
+  content += `🎂 Geboortedatum: ${dossier.geboortedatum || "Niet opgegeven"}\n`;
+  content += `📝 Info: ${dossier.info}\n`;
+  content += `📅 Datum: ${formatDateTime(dossier.datum)}\n`;
+  content += `⚡ Status: ${dossier.status || "Openstaand"}`;
+
+  fetch(webhookUrl,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({content})
+  }).catch(err=>console.error("Webhook error:",err));
 }
 
-.open{border-left:6px solid green;}
-.done{border-left:6px solid blue;}
-.expired{border-left:6px solid red;}
+// Automatisch verlopen
+function updateVerlopenStatus(){
+  const now = new Date().getTime();
+  let changed = false;
 
-  @media(max-width:600px){
-    #dossierForm input, #dossierForm textarea, #dossierForm button {
-      font-size: 0.9rem;
+  dossiers.forEach(d => {
+    if(d.label === "Arrestatiebevel" || d.label === "Overig"){
+      const created = new Date(d.datum).getTime();
+      const seconds = (now - created) / 1000;
+
+const hours = seconds / 3600; // seconden → uren
+if(hours >= 48 && d.status !== "Afgehandeld" && d.status !== "Verlopen"){
+    const before = {...d};
+    d.status = "Verlopen"; // alleen status verandert
+    changed = true;
+    sendDiscordLog("Dossier automatisch verlopen", d, before);
+}
     }
-    .dossier-card img {
-      max-width: 100%;
+  });
+
+  if(changed) save();
+}
+
+// Render dossiers
+function render(filteredDossiers = dossiers){
+  dossierList.innerHTML = "";
+  const displayDossiers = [...filteredDossiers].reverse();
+
+  displayDossiers.forEach((d)=>{
+    const origineleIndex = dossiers.indexOf(d);
+    const geboortedatumFormatted = d.geboortedatum ? d.geboortedatum.split("-").reverse().join("-") : "";
+
+    const div = document.createElement("div");
+    div.className = "dossier-card";
+
+    // Knop alleen tonen als status niet verlopen
+    const showButton = d.status !== "Verlopen";
+
+    div.innerHTML = `
+      <h3>${d.titel || ""}</h3>
+      <p><strong>Soort:</strong> <span style="color: black;">${d.label}</span></p>
+      <p><strong>Status:</strong> 
+        <span style="color: ${d.status === 'Verlopen' ? 'red' : d.status === 'Afgehandeld' ? 'blue' : 'green'};">
+          ${d.status || 'Openstaand'}
+        </span>
+      </p>
+      <p><strong>Dienst:</strong> ${d.dienst || "Onbekend"}</p>
+      <p><strong>Roepnummer:</strong> ${d.roepnummer}</p>
+      ${d.kenteken ? `<p><strong>Kenteken:</strong> ${d.kenteken}</p>` : ""}
+      ${geboortedatumFormatted ? `<p><strong>Geboortedatum:</strong> ${geboortedatumFormatted}</p>` : ""}
+      <p>${d.info}</p>
+<p><em>Aangemaakt op: ${formatDateTime(d.datum)}</em></p>
+<p><strong>⏳ Verloopt over:</strong> ${getRemainingTime(d)}</p>
+      ${d.afbeeldingen && d.afbeeldingen.length ? d.afbeeldingen.map(img => `<img src="${img}" style="max-width:200px;margin-top:5px;margin-right:5px;">`).join("") : ""}
+      <div style="margin-top:8px;">
+        ${showButton ? `<button onclick="toggleAfgehandeld(${origineleIndex})">
+          ${d.status === "Afgehandeld" ? (role === "korpsleiding" ? "Terugzetten" : "Afgehandeld") : "Afgehandeld"}
+        </button>` : ""}
+        ${role === "korpsleiding" ? `<button onclick="editDossier(${origineleIndex})">Bewerken</button>
+        <button onclick="deleteDossier(${origineleIndex})">Verwijderen</button>` : ""}
+      </div>
+    `;
+
+    dossierList.appendChild(div);
+  });
+}
+
+// Opslaan
+function save(){
+  localStorage.setItem("dossiers",JSON.stringify(dossiers));
+  render();
+}
+
+// Nieuw dossier
+if(dossierForm){
+  dossierForm.addEventListener("submit",function(e){
+    e.preventDefault();
+    const files = Array.from(afbeeldingInput.files);
+    const datum = new Date().toISOString();
+    const titel = titelInput.value.trim();
+    const dienst = dienstInput.value;
+    const roepnummer = roepnummerInput.value.trim();
+    const label = labelInput.value;
+    const kenteken = kentekenInput.value.trim();
+    const geboortedatum = geboortedatumInput.value;
+    const info = infoInput.value.trim();
+
+    if(!roepnummer || !info || !label){
+      alert("Roepnummer, info, dienst en soort zijn verplicht!");
+      return;
     }
+
+    const images = [];
+    let loaded = 0;
+
+    function finalizeDossier(imgs){
+      const nieuwDossier = {
+        titel, dienst, label, roepnummer, kenteken,
+        geboortedatum, info, afbeeldingen: imgs,
+        datum, status: "Openstaand"
+      };
+      dossiers.push(nieuwDossier);
+      save();
+      dossierForm.reset();
+      sendDiscordLog("Dossier toegevoegd", nieuwDossier);
+    }
+
+    if(files.length === 0) finalizeDossier([]);
+    else{
+      files.forEach(file=>{
+        const reader = new FileReader();
+        reader.onload = function(e){
+          images.push(e.target.result);
+          loaded++;
+          if(loaded === files.length) finalizeDossier(images);
+        }
+        reader.readAsDataURL(file);
+      });
+    }
+  });
+}
+
+// Toggle afgehandeld
+window.toggleAfgehandeld = function(i){
+  const d = dossiers[i];
+  if(d.status === "Verlopen"){
+    return; // kan niet meer veranderen
   }
-</style>
-</head>
-<body>
 
-<header class="site-header">
-  <h1>Dossierbeheer</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="korpsleiding.html">Korpsleiding</a>
-    <a href="fotos.html">Foto’s</a>
-    <a href="wetboek.html">Wetboek</a>
-    <a href="rangstructuur.html">Rangstructuur</a>
-    <a href="dreigingsniveau.html">Dreigingsniveau</a>
-    <a href="overons.html">Over Ons</a>
-    <a href="login.html">Uitloggen</a>
-  </nav>
-</header>
+  const before = {...d};
 
-<!-- Zoekveld -->
-<input type="text" id="searchInput" placeholder="Zoek op titel, geboortedatum, kenteken of roepnummer...">
+  if(d.status === "Afgehandeld" && role !== "korpsleiding"){
+    alert("Alleen korpsleiding kan terugzetten!");
+    return;
+  }
 
-<!-- Filters -->
-<div id="filters">
-  <button onclick="filterStatus('Alle')">Alle</button>
-  <button onclick="filterStatus('Openstaand')">Openstaand</button>
-  <button onclick="filterStatus('Afgehandeld')">Afgehandeld</button>
-  <button onclick="filterStatus('Verlopen')">Verlopen</button>
-</div>
+  d.status = d.status === "Afgehandeld" ? "Openstaand" : "Afgehandeld";
+  save();
+  sendDiscordLog(`Status veranderd naar ${d.status}`, d, before);
+}
 
-<main>
-<form id="dossierForm">
-  <h2>Nieuw Dossier</h2>
+// Bewerken
+window.editDossier = function(i){
+  if(role !== "korpsleiding") return alert("Geen rechten!");
+  const d = dossiers[i];
+  const before = {...d};
+  const newTitel = prompt("Naam:",d.titel);
+  const newDienst = prompt("Dienst (Politie/KMar):",d.dienst);
+  const newLabel = prompt("Soort (Groot Onderzoek / Arrestatiebevel / Overig):",d.label);
+  const newRoepnummer = prompt("Roepnummer:",d.roepnummer);
+  const newKenteken = prompt("Kenteken:",d.kenteken || "");
+  const newGeboortedatum = prompt("Geboortedatum:",d.geboortedatum || "");
+  const newInfo = prompt("Info:",d.info);
 
-  <input type="text" id="titelInput" placeholder="Naam">
+  if(newRoepnummer && newInfo && newLabel){
+    d.titel = newTitel; d.dienst = newDienst; d.label = newLabel;
+    d.roepnummer = newRoepnummer; d.kenteken = newKenteken;
+    d.geboortedatum = newGeboortedatum; d.info = newInfo;
+    save();
+    sendDiscordLog("Dossier bewerkt",d,before);
+  }
+}
 
-  <select id="dienstInput">
-    <option value="Politie">Politie</option>
-    <option value="KMar">KMar</option>
-  </select>
+// Verwijderen
+window.deleteDossier = function(i){
+  if(role !== "korpsleiding") return alert("Geen rechten!");
+  if(confirm("Weet je zeker dat je dit dossier wilt verwijderen?")){
+    const removed = dossiers.splice(i,1)[0];
+    save();
+    sendDiscordLog("Dossier verwijderd",removed);
+  }
+}
 
-  <input type="text" id="roepnummerInput" placeholder="Roepnummer" required>
+// Zoekfunctie
+if(searchInput){
+  searchInput.addEventListener("input",function(){
+    const query = this.value.toLowerCase();
+    const filtered = dossiers.filter(d =>
+      (d.titel && d.titel.toLowerCase().includes(query)) ||
+      d.roepnummer.toLowerCase().includes(query) ||
+      (d.kenteken && d.kenteken.toLowerCase().includes(query)) ||
+      (d.geboortedatum && d.geboortedatum.toLowerCase().includes(query))
+    );
+    render(filtered);
+  });
+}
 
-  <select id="labelInput" required>
-    <option value="Groot Onderzoek">Groot Onderzoek</option>
-    <option value="Arrestatiebevel">Arrestatiebevel</option>
-    <option value="Overig">Overig</option>
-  </select>
+// Filters
+window.filterStatus = function(status){
+  if(status === "Alle"){ render(); return; }
+  const filtered = dossiers.filter(d => d.status === status || d.label === status);
+  render(filtered);
+}
 
-  <input type="text" id="kentekenInput" placeholder="Kenteken voertuig">
+function updateStats(){
+  const open = dossiers.filter(d => d.status === "Openstaand").length;
+  const afgehandeld = dossiers.filter(d => d.status === "Afgehandeld").length;
+  const verlopen = dossiers.filter(d => d.status === "Verlopen").length;
 
-  <input type="date" id="geboortedatumInput">
+  document.getElementById("statOpen").textContent = open;
+  document.getElementById("statAfgehandeld").textContent = afgehandeld;
+  document.getElementById("statVerlopen").textContent = verlopen;
+}
 
-  <textarea id="infoInput" placeholder="Info" required></textarea>
+function updateStats(){
+  const open = dossiers.filter(d => d.status === "Openstaand").length;
+  const afgehandeld = dossiers.filter(d => d.status === "Afgehandeld").length;
+  const verlopen = dossiers.filter(d => d.status === "Verlopen").length;
 
-  <input type="file" id="afbeeldingInput" accept=".png,.jpg,.jpeg,.webp" multiple>
+  document.getElementById("statOpen").textContent = open;
+  document.getElementById("statAfgehandeld").textContent = afgehandeld;
+  document.getElementById("statVerlopen").textContent = verlopen;
+}
 
-  <button type="submit">Toevoegen</button>
-</form>
+function getRemainingTime(d){
+  if(d.status === "Verlopen") return "Verlopen";
 
-<div class="dashboard">
-  <div class="card open">
-    🟢 Openstaand
-    <h2 id="statOpen">0</h2>
-  </div>
+  const created = new Date(d.datum).getTime();
+  const now = new Date().getTime();
+  const totalMinutes = Math.floor((now - created) / (1000*60));
 
-  <div class="card done">
-    🔵 Afgehandeld
-    <h2 id="statAfgehandeld">0</h2>
-  </div>
+  const remainingMinutes = (48*60) - totalMinutes;
 
-  <div class="card expired">
-    🔴 Verlopen
-    <h2 id="statVerlopen">0</h2>
-  </div>
-</div>
+  if(remainingMinutes <= 0){
+    return "0 uur 0 min";
+  }
 
-<div id="dossierList"></div>
-</main>
+  const hours = Math.floor(remainingMinutes / 60);
+  const minutes = remainingMinutes % 60;
 
-<script src="dossiers.js"></script>
-</body>
-</html>
+  return `${hours} uur ${minutes} min`;
+}
+
+// Initial
+updateVerlopenStatus();
+render();
+
+// Herhaald automatisch checken (bijvoorbeeld elke seconde voor test)
+setInterval(updateVerlopenStatus, 1000);
+
+updateStats();

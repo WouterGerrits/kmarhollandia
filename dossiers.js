@@ -1,5 +1,5 @@
 // Check login
-if(localStorage.getItem("loggedIn") !== "true"){
+if(localStorage.getItem("loggedIn") !== "true" || !localStorage.getItem("role")){
   window.location.href = "login.html";
 }
 

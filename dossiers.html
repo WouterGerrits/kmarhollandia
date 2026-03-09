@@ -102,6 +102,30 @@
     box-sizing: border-box;
   }
 
+  .dashboard{
+display:flex;
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+flex:1;
+padding:15px;
+border-radius:10px;
+background:#f4f4f4;
+text-align:center;
+font-weight:bold;
+}
+
+.card h2{
+margin:5px 0 0 0;
+font-size:28px;
+}
+
+.open{border-left:6px solid green;}
+.done{border-left:6px solid blue;}
+.expired{border-left:6px solid red;}
+
   @media(max-width:600px){
     #dossierForm input, #dossierForm textarea, #dossierForm button {
       font-size: 0.9rem;
@@ -168,6 +192,23 @@
 
   <button type="submit">Toevoegen</button>
 </form>
+
+<div class="dashboard">
+  <div class="card open">
+    🟢 Openstaand
+    <h2 id="statOpen">0</h2>
+  </div>
+
+  <div class="card done">
+    🔵 Afgehandeld
+    <h2 id="statAfgehandeld">0</h2>
+  </div>
+
+  <div class="card expired">
+    🔴 Verlopen
+    <h2 id="statVerlopen">0</h2>
+  </div>
+</div>
 
 <div id="dossierList"></div>
 </main>
